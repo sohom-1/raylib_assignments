@@ -6,12 +6,21 @@ const windowWidth = 1200;
 const windowHeight = 800;
 const windowColor = r.BLACK;
 
-let scannerX = 0;
-let scannerY = 0;
-const scannerWidth = 40;
-const scannerHeight = windowHeight;
-let scannerColor = r.WHITE;
-let scannerDirection = "right";
+
+
+let scanner1X = 0;
+let scanner1Y = 0;
+const scanner1Width = 40;
+const scanner1Height = windowHeight;
+let scanner1Color = r.WHITE;
+let scanner1Speed = 10;
+
+let scanner2X = windowWidth / 2;
+let scanner2Y = 0;
+const scanner2Width = 40;
+const scanner2Height = windowHeight;
+let scanner2Color = r.WHITE;
+let scanner2Speed = 5;
 
 const field1X = 300;
 const field1Y = 0;
@@ -25,35 +34,48 @@ const field2Width = 10;
 const field2Height = windowHeight;
 const field2Color = r.BLUE;
 
-
-function changeScannerDirection(startOfScanner, sWidth, winStart, winWidth) {
-    if (startOfScanner === winStart) {
-        scannerDirection = "right";
+function isCollidedWithWall(scX, scWid, winX, winWidth) {
+    if (scX <= winX || (scX + scWid) >= (winX + winWidth)) {
+        return true;
     }
-    if ((startOfScanner + sWidth) === winWidth) {
-        scannerDirection = "left";
+    return false;
+}
+
+function moveScanners() {
+    scanner1X += scanner1Speed;
+    if (isCollidedWithWall(scanner1X, scanner1Width, windowStart, windowWidth / 2)) {
+        scanner1Speed *= -1;
+    }
+
+    scanner2X += scanner2Speed;
+    if (isCollidedWithWall(scanner2X, scanner2Width, windowWidth / 2, windowWidth / 2)) {
+        scanner2Speed *= -1;
     }
 }
 
-function moveScanner(startOfScanner, scannerWidth, windowStart, WinWidth) {
-    changeScannerDirection(startOfScanner, scannerWidth, windowStart, WinWidth);
-    if (scannerDirection === "right") { scannerX += 1; }
-    if (scannerDirection === "left") { scannerX -= 1; }
-    return;
-}
 
-
-function changeColorOFScanner() {
-    if (g.isOverLapping(scannerX, scannerWidth, field1X, field1Width) ||
-        g.isOverLapping(scannerX, scannerWidth, field2X, field2Width)) {
-        scannerColor = r.RED;
+function changeColorOFScanners() {
+    if (g.isOverLapping(scanner1X, scanner1Width, field1X, field1Width) ||
+        g.isOverLapping(scanner1X, scanner1Width, field2X, field2Width)) {
+        scanner1Color = r.RED;
         return;
     }
-    scannerColor = r.WHITE;
+    scanner1Color = r.WHITE;
+
+    if (g.isOverLapping(scanner2X, scanner2Width, field1X, field1Width) ||
+        g.isOverLapping(scanner2X, scanner2Width, field2X, field2Width)) {
+        scanner2Color = r.RED;
+        return;
+    }
+    scanner2Color = r.WHITE;
 }
 
 function drawField(x, y, width, height, color) {
     r.DrawRectangle(x, y, width, height, color)
+}
+
+function drawScanner(x, y, width, height, color) {
+    r.DrawRectangle(x, y, width, height, color);
 }
 
 function running() {
@@ -69,8 +91,8 @@ function setup() {
 }
 
 function update() {
-    moveScanner(scannerX, scannerWidth, windowStart, windowWidth);
-    changeColorOFScanner();
+    moveScanners();
+    changeColorOFScanners();
 }
 
 function draw() {
@@ -78,7 +100,8 @@ function draw() {
     r.BeginDrawing();
     drawField(field1X, field1Y, field1Width, field1Height, field1Color);
     drawField(field2X, field2Y, field2Width, field2Height, field2Color);
-    r.DrawRectangle(scannerX, scannerY, scannerWidth, scannerHeight, scannerColor);
+    drawScanner(scanner1X, scanner1Y, scanner1Width, scanner1Height, scanner1Color);
+    drawScanner(scanner2X, scanner2Y, scanner2Width, scanner2Height, scanner2Color);
     r.EndDrawing();
 }
 
