@@ -9,8 +9,14 @@ let scannerX = 0;
 let scannerY = 0;
 const scannerWidth = 40;
 const scannerHeight = windowHeight;
-const scannerColor = r.WHITE;
+let scannerColor = r.WHITE;
 let scannerDirection = "right";
+
+const particleX = 300;
+const particleY = 0;
+const particleWidth = 100;
+const particleHeight = windowHeight;
+const particleColor = r.BLUE;
 
 
 function changeScannerDirection(startOfScanner, sWidth, winStart, winWidth) {
@@ -30,13 +36,14 @@ function moveScanner(startOfScanner, scannerWidth, windowStart, WinWidth) {
 }
 
 
+
 function running() {
     return !r.WindowShouldClose();
 }
 
 function setup() {
     const NAME = "Particle Detector";
-    const FPS = 500;
+    const FPS = 50;
 
     r.InitWindow(windowWidth, windowHeight, NAME);
     r.SetTargetFPS(FPS);
@@ -49,6 +56,7 @@ function update() {
 function draw() {
     r.ClearBackground(windowColor);
     r.BeginDrawing();
+    r.DrawRectangle(particleX, particleY, particleWidth, particleHeight, particleColor);
     r.DrawRectangle(scannerX, scannerY, scannerWidth, scannerHeight, scannerColor);
     r.EndDrawing();
 }
