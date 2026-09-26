@@ -1,4 +1,5 @@
 const r = require("raylib");
+const g = require("./geometry")
 
 const windowStart = 0;
 const windowWidth = 1200;
@@ -12,11 +13,17 @@ const scannerHeight = windowHeight;
 let scannerColor = r.WHITE;
 let scannerDirection = "right";
 
-const particleX = 300;
-const particleY = 0;
-const particleWidth = 100;
-const particleHeight = windowHeight;
-const particleColor = r.BLUE;
+const field1X = 300;
+const field1Y = 0;
+const field1Width = 100;
+const field1Height = windowHeight;
+const field1Color = r.BLUE;
+
+const field2X = 900;
+const field2Y = 0;
+const field2Width = 10;
+const field2Height = windowHeight;
+const field2Color = r.BLUE;
 
 
 function changeScannerDirection(startOfScanner, sWidth, winStart, winWidth) {
@@ -35,22 +42,18 @@ function moveScanner(startOfScanner, scannerWidth, windowStart, WinWidth) {
     return;
 }
 
-function isOverLapping() {
-    if (scannerX >= particleX && scannerX <= particleX + particleWidth) {
-        return true;
-    }
-    if (scannerX + scannerWidth <= particleX + particleWidth && scannerX + scannerWidth >= particleX) {
-        return true;
-    }
-    return false;
-}
 
 function changeColorOFScanner() {
-    if (isOverLapping()) {
+    if (g.isOverLapping(scannerX, scannerWidth, field1X, field1Width) ||
+        g.isOverLapping(scannerX, scannerWidth, field2X, field2Width)) {
         scannerColor = r.RED;
         return;
     }
     scannerColor = r.WHITE;
+}
+
+function drawField(x, y, width, height, color) {
+    r.DrawRectangle(x, y, width, height, color)
 }
 
 function running() {
@@ -73,7 +76,8 @@ function update() {
 function draw() {
     r.ClearBackground(windowColor);
     r.BeginDrawing();
-    r.DrawRectangle(particleX, particleY, particleWidth, particleHeight, particleColor);
+    drawField(field1X, field1Y, field1Width, field1Height, field1Color);
+    drawField(field2X, field2Y, field2Width, field2Height, field2Color);
     r.DrawRectangle(scannerX, scannerY, scannerWidth, scannerHeight, scannerColor);
     r.EndDrawing();
 }
