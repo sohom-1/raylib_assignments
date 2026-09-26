@@ -35,7 +35,23 @@ function moveScanner(startOfScanner, scannerWidth, windowStart, WinWidth) {
     return;
 }
 
+function isOverLapping() {
+    if (scannerX >= particleX && scannerX <= particleX + particleWidth) {
+        return true;
+    }
+    if (scannerX + scannerWidth <= particleX + particleWidth && scannerX + scannerWidth >= particleX) {
+        return true;
+    }
+    return false;
+}
 
+function changeColorOFScanner() {
+    if (isOverLapping()) {
+        scannerColor = r.RED;
+        return;
+    }
+    scannerColor = r.WHITE;
+}
 
 function running() {
     return !r.WindowShouldClose();
@@ -51,6 +67,7 @@ function setup() {
 
 function update() {
     moveScanner(scannerX, scannerWidth, windowStart, windowWidth);
+    changeColorOFScanner();
 }
 
 function draw() {
