@@ -22,6 +22,13 @@ const scanner2Height = windowHeight;
 let scanner2Color = r.WHITE;
 let scanner2Speed = 5;
 
+let scanner3X = 0;
+let scanner3Y = 0;
+const scanner3Width = windowWidth;
+const scanner3Height = 30;
+let scanner3Color = r.WHITE;
+let scanner3Speed = 10;
+
 const field1X = 300;
 const field1Y = 0;
 const field1Width = 100;
@@ -34,8 +41,14 @@ const field2Width = 10;
 const field2Height = windowHeight;
 const field2Color = r.BLUE;
 
-function isCollidedWithWall(scX, scWid, winX, winWidth) {
-    if (scX <= winX || (scX + scWid) >= (winX + winWidth)) {
+const field3X = 0;
+const field3Y = 250;
+const field3Width = windowWidth;
+const field3Height = 20;
+const field3Color = r.BLUE;
+
+function isCollidedWithWall(scCord, scCoverage, winCord, winCoverage) {
+    if (scCord <= winCord || (scCord + scCoverage) >= (winCord + winCoverage)) {
         return true;
     }
     return false;
@@ -50,6 +63,11 @@ function moveScanners() {
     scanner2X += scanner2Speed;
     if (isCollidedWithWall(scanner2X, scanner2Width, windowWidth / 2, windowWidth / 2)) {
         scanner2Speed *= -1;
+    }
+
+    scanner3Y += scanner3Speed;
+    if (isCollidedWithWall(scanner3Y, scanner3Height, windowStart, windowHeight)) {
+        scanner3Speed *= -1;
     }
 }
 
@@ -68,6 +86,12 @@ function changeColorOFScanners() {
         return;
     }
     scanner2Color = r.WHITE;
+
+    if (g.isOverLapping(scanner3Y, scanner3Height, field3Y, field3Height)) {
+        scanner3Color = r.RED;
+        return;
+    }
+    scanner3Color = r.WHITE;
 }
 
 function drawField(x, y, width, height, color) {
@@ -100,8 +124,10 @@ function draw() {
     r.BeginDrawing();
     drawField(field1X, field1Y, field1Width, field1Height, field1Color);
     drawField(field2X, field2Y, field2Width, field2Height, field2Color);
+    drawField(field3X, field3Y, field3Width, field3Height, field3Color);
     drawScanner(scanner1X, scanner1Y, scanner1Width, scanner1Height, scanner1Color);
     drawScanner(scanner2X, scanner2Y, scanner2Width, scanner2Height, scanner2Color);
+    drawScanner(scanner3X, scanner3Y, scanner3Width, scanner3Height, scanner3Color);
     r.EndDrawing();
 }
 
