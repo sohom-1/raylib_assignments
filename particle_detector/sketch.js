@@ -1,134 +1,77 @@
 const r = require("raylib");
-const g = require("./geometry")
-
-const windowStart = 0;
-const windowWidth = 1200;
-const windowHeight = 800;
-const windowColor = r.BLACK;
-
+const s1 = require("./scanner1");
+const s2 = require("./scanner2");
+const s3 = require("./scanner3");
+const c = require("./calculation");
+const f = require("./fields");
 
 
-let scanner1X = 0;
-let scanner1Y = 0;
-const scanner1Width = 40;
-const scanner1Height = windowHeight;
-let scanner1Color = r.WHITE;
-let scanner1Speed = 10;
 
-let scanner2X = windowWidth / 2;
-let scanner2Y = 0;
-const scanner2Width = 40;
-const scanner2Height = windowHeight;
-let scanner2Color = r.WHITE;
-let scanner2Speed = 5;
-
-let scanner3X = 0;
-let scanner3Y = 0;
-const scanner3Width = windowWidth;
-const scanner3Height = 30;
-let scanner3Color = r.WHITE;
-let scanner3Speed = 10;
-
-const field1X = 300;
-const field1Y = 0;
-const field1Width = 100;
-const field1Height = windowHeight;
-const field1Color = r.BLUE;
-
-const field2X = 900;
-const field2Y = 0;
-const field2Width = 10;
-const field2Height = windowHeight;
-const field2Color = r.BLUE;
-
-const field3X = 0;
-const field3Y = 250;
-const field3Width = windowWidth;
-const field3Height = 20;
-const field3Color = r.BLUE;
-
-function isCollidedWithWall(scCord, scCoverage, winCord, winCoverage) {
-    if (scCord <= winCord || (scCord + scCoverage) >= (winCord + winCoverage)) {
-        return true;
-    }
-    return false;
-}
-
-function moveScanners() {
-    scanner1X += scanner1Speed;
-    if (isCollidedWithWall(scanner1X, scanner1Width, windowStart, windowWidth / 2)) {
-        scanner1Speed *= -1;
-    }
-
-    scanner2X += scanner2Speed;
-    if (isCollidedWithWall(scanner2X, scanner2Width, windowWidth / 2, windowWidth / 2)) {
-        scanner2Speed *= -1;
-    }
-
-    scanner3Y += scanner3Speed;
-    if (isCollidedWithWall(scanner3Y, scanner3Height, windowStart, windowHeight)) {
-        scanner3Speed *= -1;
-    }
-}
-
-
-function changeColorOFScanners() {
-    if (g.isOverLapping(scanner1X, scanner1Width, field1X, field1Width) ||
-        g.isOverLapping(scanner1X, scanner1Width, field2X, field2Width)) {
-        scanner1Color = r.RED;
-        return;
-    }
-    scanner1Color = r.WHITE;
-
-    if (g.isOverLapping(scanner2X, scanner2Width, field1X, field1Width) ||
-        g.isOverLapping(scanner2X, scanner2Width, field2X, field2Width)) {
-        scanner2Color = r.RED;
-        return;
-    }
-    scanner2Color = r.WHITE;
-
-    if (g.isOverLapping(scanner3Y, scanner3Height, field3Y, field3Height)) {
-        scanner3Color = r.RED;
-        return;
-    }
-    scanner3Color = r.WHITE;
-}
-
-function drawField(x, y, width, height, color) {
-    r.DrawRectangle(x, y, width, height, color)
-}
-
-function drawScanner(x, y, width, height, color) {
-    r.DrawRectangle(x, y, width, height, color);
-}
+const WIDTH = 400;
+const HEIGHT = 400;
 
 function running() {
     return !r.WindowShouldClose();
 }
 
 function setup() {
-    const NAME = "Particle Detector";
+    const TITLE = "Particle ditector";
     const FPS = 50;
-
-    r.InitWindow(windowWidth, windowHeight, NAME);
+    r.SetTraceLogLevel(r.LOG_NONE);
+    r.InitWindow(WIDTH, HEIGHT, TITLE);
     r.SetTargetFPS(FPS);
 }
 
+function updateScanner1() {
+    s1.velocity = c.changeScannerVelocity(s1.start, s1.width, s1.lower, s1.upper, s1.velocity);
+    s1.start += s1.velocity;
+}
+
+function updateScanner2() {
+    s2.velocity = c.changeScannerVelocity(s2.start, s2.width, s2.lower, s2.upper, s2.velocity);
+    s2.start += s2.velocity;
+}
+
+function updateScanner3() {
+    s3.velocity = c.changeScannerVelocity(s3.start, s3.height, s3.lower, s3.upper, s3.velocity);
+    s3.start += s3.velocity;
+}
+
 function update() {
-    moveScanners();
-    changeColorOFScanners();
+    updateScanner1();
+    updateScanner2();
+    updateScanner3();
+
+}
+
+
+function drawScanner(x, y, width, height, hasDetected) {
+    if (hasDetected) {
+        r.DrawRectangle(x, y, width, height, r.RED);
+    } else {
+        r.DrawRectangle(x, y, width, height, r.WHITE);
+    }
+}
+
+function drawRange(x, y, width, height, color) {
+    r.DrawRectangle(x, y, width, height, color);
 }
 
 function draw() {
-    r.ClearBackground(windowColor);
-    r.BeginDrawing();
-    drawField(field1X, field1Y, field1Width, field1Height, field1Color);
-    drawField(field2X, field2Y, field2Width, field2Height, field2Color);
-    drawField(field3X, field3Y, field3Width, field3Height, field3Color);
-    drawScanner(scanner1X, scanner1Y, scanner1Width, scanner1Height, scanner1Color);
-    drawScanner(scanner2X, scanner2Y, scanner2Width, scanner2Height, scanner2Color);
-    drawScanner(scanner3X, scanner3Y, scanner3Width, scanner3Height, scanner3Color);
-    r.EndDrawing();
+
+    r.BeginDrawing()
+    r.ClearBackground(r.BLACK);
+
+
+    drawRange(f.field1Start, 0, f.field1Width, HEIGHT, r.SKYBLUE);
+    drawRange(f.field2Start, 0, f.field2Width, HEIGHT, r.SKYBLUE);
+    drawRange(0, f.field3Start, WIDTH, f.field3Width, r.SKYBLUE);
+
+
+    drawScanner(s1.start, 0, s1.width, HEIGHT, c.hasDetected(s1.start, s1.width, f.field1Start, f.field1Width, f.field2Start, f.field2Width));
+    drawScanner(s2.start, 0, s2.width, HEIGHT, c.hasDetected(s2.start, s2.width, f.field1Start, f.field1Width, f.field2Start, f.field2Width));
+    drawScanner(0, s3.start, WIDTH, s3.height, c.hasDetected(s3.start, s3.height, f.field3Start, f.field3Width));
+    r.EndDrawing()
 }
 
 function teardown() {
