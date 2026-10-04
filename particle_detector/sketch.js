@@ -1,76 +1,43 @@
 const r = require("raylib");
-const s1 = require("./scanner1");
-const s2 = require("./scanner2");
-const s3 = require("./scanner3");
 const c = require("./calculation");
-const f = require("./fields");
-
-
 
 const WIDTH = 400;
 const HEIGHT = 400;
+const world = {};
 
 function running() {
     return !r.WindowShouldClose();
 }
 
 function setup() {
-    const TITLE = "Particle ditector";
-    const FPS = 50;
-    r.SetTraceLogLevel(r.LOG_NONE);
-    r.InitWindow(WIDTH, HEIGHT, TITLE);
-    r.SetTargetFPS(FPS);
-}
+    c.setupWindow(WIDTH, HEIGHT);
 
-function updateScanner1() {
-    s1.velocity = c.changeScannerVelocity(s1.start, s1.width, s1.lower, s1.upper, s1.velocity);
-    s1.start += s1.velocity;
-}
+    world.s1 = c.createScanner(0, 0, 20, HEIGHT, 1, WIDTH / 2, 0, "H");
+    world.s2 = c.createScanner(WIDTH / 2, 0, 20, HEIGHT, 2, WIDTH, WIDTH / 2, "H");
+    world.s3 = c.createScanner(0, 0, WIDTH, 20, 1, HEIGHT, 0, "V");
 
-function updateScanner2() {
-    s2.velocity = c.changeScannerVelocity(s2.start, s2.width, s2.lower, s2.upper, s2.velocity);
-    s2.start += s2.velocity;
-}
-
-function updateScanner3() {
-    s3.velocity = c.changeScannerVelocity(s3.start, s3.height, s3.lower, s3.upper, s3.velocity);
-    s3.start += s3.velocity;
+    world.f1 = c.createField(100, 0, 50, HEIGHT, "H", r.BLUE);
+    world.f2 = c.createField(350, 0, 30, HEIGHT, "H", r.BLUE);
+    world.f3 = c.createField(0, 200, WIDTH, 20, "V", r.BLUE);
 }
 
 function update() {
-    updateScanner1();
-    updateScanner2();
-    updateScanner3();
-
-}
-
-
-function drawScanner(x, y, width, height, hasDetected) {
-    if (hasDetected) {
-        r.DrawRectangle(x, y, width, height, r.RED);
-    } else {
-        r.DrawRectangle(x, y, width, height, r.WHITE);
-    }
-}
-
-function drawRange(x, y, width, height, color) {
-    r.DrawRectangle(x, y, width, height, color);
+    c.updateScanner(world.s1);
+    c.updateScanner(world.s2);
+    c.updateScanner(world.s3);
 }
 
 function draw() {
-
     r.BeginDrawing()
     r.ClearBackground(r.BLACK);
 
+    c.drawRange(world.f1);
+    c.drawRange(world.f2);
+    c.drawRange(world.f3);
 
-    drawRange(f.field1Start, 0, f.field1Width, HEIGHT, r.SKYBLUE);
-    drawRange(f.field2Start, 0, f.field2Width, HEIGHT, r.SKYBLUE);
-    drawRange(0, f.field3Start, WIDTH, f.field3Width, r.SKYBLUE);
-
-
-    drawScanner(s1.start, 0, s1.width, HEIGHT, c.hasDetected(s1.start, s1.width, f.field1Start, f.field1Width, f.field2Start, f.field2Width));
-    drawScanner(s2.start, 0, s2.width, HEIGHT, c.hasDetected(s2.start, s2.width, f.field1Start, f.field1Width, f.field2Start, f.field2Width));
-    drawScanner(0, s3.start, WIDTH, s3.height, c.hasDetected(s3.start, s3.height, f.field3Start, f.field3Width));
+    c.drawScanner(world.s1, world.f1, world.f2);
+    c.drawScanner(world.s2, world.f1, world.f2);
+    c.drawScanner(world.s3, world.f3, world.f3);
     r.EndDrawing()
 }
 
